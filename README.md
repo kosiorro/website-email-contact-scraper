@@ -518,12 +518,10 @@ Email: [happy.to.help@omkar.cloud](mailto:happy.to.help@omkar.cloud?subject=Webs
 
 [![Email Us about Website Email & Contact Scraper](https://raw.githubusercontent.com/omkarcloud/assets/master/images/ask-on-email.png)](mailto:happy.to.help@omkar.cloud?subject=Website%20Email%20Contact%20Scraper%20Question)
 
-## Love It? Star It! ⭐
+## ⭐ Love It? [Star It ⭐!](https://github.com/omkarcloud/website-email-contact-scraper)
 
-From one developer to another: if this scraper saved you time, please [star the repo](https://github.com/omkarcloud/website-email-contact-scraper).
+Star the repo ⭐ and become a star hero!
 
-Here's why it matters: most developers judge a scraper by its stars before trying it. Your star helps the next developer — someone deciding whether the contact data here is real and reliable — try it with confidence.
+It's just 1 click, but it means the world to me.
 
-It takes only 1 second, and means the world to me.
-
-Made with ❤️ using [Botasaurus](https://github.com/omkarcloud/botasaurus)
+[![Star us on GitHub](https://raw.githubusercontent.com/omkarcloud/google-maps-scraper/master/screenshots/star-us.png)](https://github.com/omkarcloud/website-email-contact-scraper)
