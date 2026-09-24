@@ -279,7 +279,8 @@ export const globalStyles = css`
   }
 
   body {
-    background: #f6e2e7;
+    background: #f4f7fb;
+    color: #162033;
   }
 
   .container {
@@ -539,5 +540,257 @@ export const globalStyles = css`
   .title-lh {
     line-height: 1.75; 
   }    
-  `
+  
+
+  /* KontaktFinder */
+  body {
+    font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  }
+
+  .euiHeader {
+    background: #0f172a !important;
+    border-bottom: 1px solid rgba(255,255,255,.08);
+    box-shadow: 0 8px 28px rgba(15, 23, 42, .12);
+  }
+
+  .euiHeader .euiHeaderLink {
+    color: #cbd5e1 !important;
+    font-weight: 600;
+  }
+
+  .euiHeader .euiHeaderLink:hover {
+    color: #ffffff !important;
+  }
+
+  .brand-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    color: #fff;
+  }
+
+  .brand-mark {
+    width: 32px;
+    height: 32px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #3b82f6, #6366f1);
+    color: #fff;
+    font-weight: 900;
+    font-size: 19px;
+    box-shadow: 0 6px 16px rgba(59, 130, 246, .28);
+  }
+
+  .euiHeader + .home-container {
+    padding-top: 86px;
+  }
+
+  .hero-panel {
+    position: relative;
+    overflow: hidden;
+    padding: 44px;
+    border-radius: 24px;
+    color: #fff;
+    background:
+      radial-gradient(circle at 88% 16%, rgba(96,165,250,.28), transparent 34%),
+      linear-gradient(135deg, #0f172a 0%, #172554 58%, #1e3a8a 100%);
+    box-shadow: 0 22px 60px rgba(15, 23, 42, .18);
+  }
+
+  .hero-panel h1 {
+    max-width: 720px;
+    margin: 12px 0 14px;
+    color: #fff;
+    font-size: clamp(32px, 5vw, 48px);
+    line-height: 1.08;
+    letter-spacing: -1.4px;
+  }
+
+  .hero-panel p {
+    max-width: 760px;
+    margin: 0;
+    color: #dbeafe;
+    font-size: 17px;
+    line-height: 1.7;
+  }
+
+  .hero-badge {
+    display: inline-flex;
+    padding: 7px 11px;
+    border: 1px solid rgba(255,255,255,.18);
+    border-radius: 999px;
+    background: rgba(255,255,255,.08);
+    color: #bfdbfe;
+    font-size: 12px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+  }
+
+  .hero-features {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 26px;
+  }
+
+  .hero-features span {
+    padding: 8px 12px;
+    border-radius: 10px;
+    background: rgba(255,255,255,.10);
+    color: #f8fafc;
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  .workspace-card {
+    margin-top: 24px;
+    overflow: hidden;
+    border: 1px solid #e5eaf1;
+    border-radius: 20px;
+    background: #fff;
+    box-shadow: 0 14px 40px rgba(15, 23, 42, .07);
+  }
+
+  .workspace-card .app-tabs {
+    margin: 0;
+    padding: 0 26px;
+    border-bottom: 1px solid #edf0f5;
+    background: #fbfcfe;
+  }
+
+  .workspace-body {
+    margin: 0;
+    padding: 28px;
+  }
+
+  .section-heading {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 20px;
+    margin-bottom: 26px;
+  }
+
+  .section-heading h2 {
+    margin: 4px 0 0;
+    color: #0f172a;
+    font-size: 24px;
+    line-height: 1.25;
+  }
+
+  .eyebrow {
+    color: #2563eb;
+    font-size: 12px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+  }
+
+  .privacy-note {
+    padding: 7px 10px;
+    border-radius: 999px;
+    background: #ecfdf5;
+    color: #047857;
+    font-size: 12px;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+
+  .contact-form .euiFormRow {
+    margin-bottom: 20px;
+  }
+
+  .contact-form .euiFormRow__label {
+    margin-bottom: 8px;
+    color: #334155;
+    font-size: 13px;
+    font-weight: 700;
+  }
+
+  .contact-form .euiFieldText,
+  .contact-form .euiTextArea,
+  .contact-form .euiSelect {
+    min-height: 44px;
+    border-radius: 10px;
+    border-color: #dbe2ea;
+    box-shadow: none;
+  }
+
+  .contact-form .euiFieldText:focus,
+  .contact-form .euiTextArea:focus,
+  .contact-form .euiSelect:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, .12);
+  }
+
+  .form-actions {
+    align-items: center;
+    gap: 16px !important;
+  }
+
+  .form-actions .euiButton {
+    min-height: 44px;
+    border-radius: 10px;
+    font-weight: 700;
+  }
+
+  .info-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+    margin-top: 18px;
+  }
+
+  .info-card {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    padding: 18px;
+    border: 1px solid #e7ebf1;
+    border-radius: 14px;
+    background: #fff;
+  }
+
+  .info-card strong {
+    color: #0f172a;
+    font-size: 14px;
+  }
+
+  .info-card span {
+    color: #64748b;
+    font-size: 13px;
+    line-height: 1.55;
+  }
+
+  .euiDataGrid,
+  .euiPanel {
+    border-radius: 14px;
+  }
+
+  @media (max-width: 768px) {
+    .hero-panel {
+      padding: 30px 24px;
+      border-radius: 18px;
+    }
+
+    .workspace-body {
+      padding: 20px;
+    }
+
+    .section-heading {
+      flex-direction: column;
+    }
+
+    .info-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .euiHeader .euiHeaderLink {
+      display: none;
+    }
+  }
+`
 
