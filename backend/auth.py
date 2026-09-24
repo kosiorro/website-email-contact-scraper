@@ -108,6 +108,14 @@ def _init_db():
                 FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
             );
 
+            CREATE TABLE IF NOT EXISTS synced_tasks (
+                user_id INTEGER NOT NULL,
+                task_id INTEGER NOT NULL,
+                synced_at INTEGER NOT NULL,
+                PRIMARY KEY(user_id, task_id),
+                FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
+            );
+
             CREATE INDEX IF NOT EXISTS idx_sessions_token ON sessions(token_hash);
             CREATE INDEX IF NOT EXISTS idx_contacts_user ON contacts(user_id);
             CREATE INDEX IF NOT EXISTS idx_contacts_domain ON contacts(domain);
@@ -496,42 +504,80 @@ def _upsert_contact(conn, user_id, task_id, record):
     return True
 
 
+def _sync_task_for_user(user_id, task_id):
+    from botasaurus_server.db_setup import Session
+    from botasaurus_server.models import Task, TaskStatus
+    from botasaurus_server.task_results import TaskResults
+
+    with _db() as conn:
+        already = conn.execute(
+            "SELECT 1 FROM synced_tasks WHERE user_id = ? AND task_id = ?",
+            (user_id, task_id),
+        ).fetchone()
+    if already:
+        return 0
+
+    with Session() as session:
+        task = session.query(Task).filter(Task.id == int(task_id)).first()
+        if not task or task.status != TaskStatus.COMPLETED:
+            return 0
+        metadata = task.meta_data or {}
+        if int(metadata.get("kf_user_id", -1)) != int(user_id):
+            return 0
+        results = (
+            TaskResults.get_all_task(task.id)
+            if task.is_all_task
+            else TaskResults.get_task(task.id)
+        )
+
+    if not isinstance(results, list):
+        return 0
+
+    saved = 0
+    with _db() as conn:
+        for record in results:
+            if isinstance(record, dict) and _upsert_contact(conn, user_id, task_id, record):
+                saved += 1
+        conn.execute(
+            "INSERT OR REPLACE INTO synced_tasks(user_id, task_id, synced_at) VALUES (?, ?, ?)",
+            (user_id, task_id, int(time.time())),
+        )
+        conn.commit()
+    return saved
+
+
+def _sync_all_for_user(user_id):
+    from botasaurus_server.db_setup import Session
+    from botasaurus_server.models import Task, TaskStatus
+
+    with Session() as session:
+        tasks = session.query(Task.id, Task.meta_data).filter(
+            Task.status == TaskStatus.COMPLETED,
+            Task.is_all_task == True,
+        ).all()
+
+    saved = 0
+    for task_id, metadata in tasks:
+        metadata = metadata or {}
+        if int(metadata.get("kf_user_id", -1)) == int(user_id):
+            saved += _sync_task_for_user(user_id, task_id)
+    return saved
+
+
 @post("/api/database/sync/<task_id:int>")
 def database_sync(task_id):
     user = _require_user()
     if not _task_belongs_to_user(task_id, user["id"]):
         return _json_response({"message": "Nie znaleziono zadania."}, 404)
 
-    from botasaurus_server.db_setup import Session
-    from botasaurus_server.models import Task
-    from botasaurus_server.task_results import TaskResults
-
-    with Session() as session:
-        task = session.query(Task).filter(Task.id == task_id).first()
-        if not task:
-            return _json_response({"message": "Nie znaleziono zadania."}, 404)
-        results = (
-            TaskResults.get_all_task(task_id)
-            if task.is_all_task
-            else TaskResults.get_task(task_id)
-        )
-
-    if not isinstance(results, list):
-        return _json_response({"message": "Wyniki nie są jeszcze gotowe."}, 409)
-
-    saved = 0
-    with _db() as conn:
-        for record in results:
-            if isinstance(record, dict) and _upsert_contact(conn, user["id"], task_id, record):
-                saved += 1
-        conn.commit()
-
+    saved = _sync_task_for_user(user["id"], task_id)
     return {"ok": True, "saved": saved}
 
 
 @get("/api/database")
 def database_list():
     user = _require_user()
+    _sync_all_for_user(user["id"])
     query = str(request.query.get("q") or "").strip().lower()
     params = [user["id"]]
     sql = "SELECT * FROM contacts WHERE user_id = ?"
