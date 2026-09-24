@@ -1,5 +1,6 @@
 import AuthedDashboard from '../components/AuthedDashboard'
 import InputComponent from '../components/InputComponent/InputComponent'
+import { Link } from '../components/Link'
 import Seo from '../components/Seo'
 import { Container } from '../components/Wrappers'
 import { homeServerSideProps } from '../utils/props'
