@@ -1,8 +1,7 @@
 import AuthedDashboard from '../components/AuthedDashboard'
 import InputComponent from '../components/InputComponent/InputComponent'
-import Tabs, { TabsId } from '../components/PagesTabs/PagesTabs'
 import Seo from '../components/Seo'
-import { Container, TabWrapper } from '../components/Wrappers'
+import { Container } from '../components/Wrappers'
 import { homeServerSideProps } from '../utils/props'
 
 const Page = ({ ...props }: any) => {
@@ -11,54 +10,39 @@ const Page = ({ ...props }: any) => {
       <Seo
         {...props}
         title="KontaktFinder — wyszukiwarka danych kontaktowych"
-        description="Znajdź publicznie dostępne e-maile, telefony, profile społecznościowe i technologie używane przez strony internetowe."
+        description="Znajdź publicznie dostępne dane kontaktowe firm i buduj własną bazę kontaktów."
       />
       <AuthedDashboard {...props}>
         <Container>
-          <section className="hero-panel">
-            <div className="hero-badge">Wyszukiwarka kontaktów B2B</div>
-            <h1>Znajdź dane kontaktowe firmy w kilka chwil</h1>
-            <p>
-              Przeskanuj jedną lub wiele stron i zbierz w jednym miejscu
-              adresy e-mail, numery telefonów, profile społecznościowe oraz
-              wykryte technologie.
-            </p>
-            <div className="hero-features">
-              <span>✉ E-maile</span>
-              <span>☎ Telefony</span>
-              <span>in LinkedIn</span>
-              <span>◎ Social media</span>
-              <span>⚙ Technologie</span>
+          <section className="mk-hero">
+            <div className="mk-hero-copy">
+              <div className="auth-kicker"><i /> OD STRONY DO KONTAKTU</div>
+              <h1>Znajdź kontakt do firmy.<br/><span>Bez ręcznego szukania.</span></h1>
+              <p>
+                Skanuj strony internetowe, zbieraj publiczne adresy e-mail,
+                telefony, profile społecznościowe i technologie. Każdy wynik
+                trafia do Twojej własnej bazy kontaktów.
+              </p>
+            </div>
+            <div className="mk-hero-visual" aria-hidden="true">
+              <div className="orbit orbit-a">EMAIL</div>
+              <div className="orbit orbit-b">TEL</div>
+              <div className="orbit orbit-c">LINKEDIN</div>
+              <div className="orbit orbit-d">TECH</div>
             </div>
           </section>
 
-          <section className="workspace-card">
-            <Tabs initialSelectedTab={TabsId.INPUT} />
-            <TabWrapper>
-              <div className="section-heading">
-                <div>
-                  <span className="eyebrow">Nowe skanowanie</span>
-                  <h2>Podaj strony, które chcesz sprawdzić</h2>
-                </div>
-                <div className="privacy-note">Dane publicznie dostępne</div>
+          <section className="scan-panel">
+            <div className="scan-panel-heading">
+              <div>
+                <span className="eyebrow">NOWE SKANOWANIE</span>
+                <h2>Jakie strony mam sprawdzić?</h2>
               </div>
-              <InputComponent {...props} />
-            </TabWrapper>
-          </section>
-
-          <section className="info-grid">
-            <div className="info-card">
-              <strong>1. Dodaj domeny</strong>
-              <span>Możesz wkleić jedną lub wiele stron do jednego skanowania.</span>
+              <Link href="/database" passHref>
+                <a className="text-action">Przejdź do bazy kontaktów ↗</a>
+              </Link>
             </div>
-            <div className="info-card">
-              <strong>2. Wybierz zakres</strong>
-              <span>Szybkie sprawdzenie lub dokładne przejście po podstronach.</span>
-            </div>
-            <div className="info-card">
-              <strong>3. Odbierz wyniki</strong>
-              <span>Kontakty i technologie otrzymasz w czytelnym zestawieniu.</span>
-            </div>
+            <InputComponent {...props} />
           </section>
         </Container>
       </AuthedDashboard>
