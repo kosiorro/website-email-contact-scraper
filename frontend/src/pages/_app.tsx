@@ -4,7 +4,7 @@ import { EuiErrorBoundary } from '@elastic/eui';
 import { Global } from '@emotion/react';
 import Head from 'next/head';
 
-import Chrome from '../components/chrome';
+import Chrome from '../components/chrome';\nimport AuthGate from '../components/AuthGate';
 import { Theme } from '../components/theme';
 import { globalStyles } from '../styles/global.styles';
 
