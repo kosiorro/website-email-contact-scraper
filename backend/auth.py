@@ -116,6 +116,14 @@ def _init_db():
                 FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
             );
 
+            CREATE TABLE IF NOT EXISTS task_owners (
+                task_id INTEGER PRIMARY KEY,
+                user_id INTEGER NOT NULL,
+                created_at INTEGER NOT NULL,
+                FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
+            );
+
+            CREATE INDEX IF NOT EXISTS idx_task_owners_user ON task_owners(user_id);
             CREATE INDEX IF NOT EXISTS idx_sessions_token ON sessions(token_hash);
             CREATE INDEX IF NOT EXISTS idx_contacts_user ON contacts(user_id);
             CREATE INDEX IF NOT EXISTS idx_contacts_domain ON contacts(domain);
@@ -176,18 +184,39 @@ def _require_admin():
 
 
 def _task_belongs_to_user(task_id, user_id):
-    try:
-        from botasaurus_server.db_setup import Session
-        from botasaurus_server.models import Task
+    with _db() as conn:
+        row = conn.execute(
+            "SELECT 1 FROM task_owners WHERE task_id = ? AND user_id = ?",
+            (int(task_id), int(user_id)),
+        ).fetchone()
+    return bool(row)
 
-        with Session() as session:
-            task = session.query(Task.meta_data).filter(Task.id == int(task_id)).first()
-            if not task:
-                return False
-            metadata = task[0] or {}
-            return int(metadata.get("kf_user_id", -1)) == int(user_id)
-    except Exception:
-        return False
+
+def _claim_task_ids(user_id, payload):
+    ids = set()
+
+    def walk(value):
+        if isinstance(value, dict):
+            task_id = value.get("id")
+            if isinstance(task_id, int):
+                ids.add(task_id)
+            for nested in value.values():
+                walk(nested)
+        elif isinstance(value, list):
+            for nested in value:
+                walk(nested)
+
+    walk(payload)
+    if not ids:
+        return
+
+    now = int(time.time())
+    with _db() as conn:
+        conn.executemany(
+            "INSERT OR IGNORE INTO task_owners(task_id, user_id, created_at) VALUES (?, ?, ?)",
+            [(task_id, int(user_id), now) for task_id in ids],
+        )
+        conn.commit()
 
 
 def _extract_task_ids():
@@ -521,8 +550,7 @@ def _sync_task_for_user(user_id, task_id):
         task = session.query(Task).filter(Task.id == int(task_id)).first()
         if not task or task.status != TaskStatus.COMPLETED:
             return 0
-        metadata = task.meta_data or {}
-        if int(metadata.get("kf_user_id", -1)) != int(user_id):
+        if not _task_belongs_to_user(task.id, user_id):
             return 0
         results = (
             TaskResults.get_all_task(task.id)
@@ -550,17 +578,25 @@ def _sync_all_for_user(user_id):
     from botasaurus_server.db_setup import Session
     from botasaurus_server.models import Task, TaskStatus
 
+    with _db() as conn:
+        owned_ids = [
+            row["task_id"]
+            for row in conn.execute(
+                "SELECT task_id FROM task_owners WHERE user_id = ?",
+                (int(user_id),),
+            ).fetchall()
+        ]
+
     with Session() as session:
-        tasks = session.query(Task.id, Task.meta_data).filter(
+        tasks = session.query(Task.id).filter(
+            Task.id.in_(owned_ids) if owned_ids else Task.id == -1,
             Task.status == TaskStatus.COMPLETED,
             Task.is_all_task == True,
         ).all()
 
     saved = 0
-    for task_id, metadata in tasks:
-        metadata = metadata or {}
-        if int(metadata.get("kf_user_id", -1)) == int(user_id):
-            saved += _sync_task_for_user(user_id, task_id)
+    for (task_id,) in tasks:
+        saved += _sync_task_for_user(user_id, task_id)
     return saved
 
 
@@ -604,21 +640,49 @@ def database_list():
     return _json_response({"count": len(result), "results": result})
 
 
-# Tag every newly created Botasaurus task with the authenticated user.
+# Assign every created Botasaurus task to the authenticated user without
+# touching Botasaurus metadata. Non-empty metadata is forwarded to the scraper
+# as a keyword argument and would break scrape_contacts(data).
 import botasaurus_server.routes_db_logic as _routes_logic
 
-_original_validate_task_request = _routes_logic.validate_task_request
+_original_execute_async_task = _routes_logic.execute_async_task
+_original_execute_async_tasks = _routes_logic.execute_async_tasks
+_original_execute_sync_task = _routes_logic.execute_sync_task
+_original_execute_sync_tasks = _routes_logic.execute_sync_tasks
 
 
-def _validate_task_request_for_user(json_data):
-    scraper_name, data, metadata = _original_validate_task_request(json_data)
+def _execute_async_task_for_user(json_data):
     user = _require_user()
-    metadata = dict(metadata or {})
-    metadata["kf_user_id"] = int(user["id"])
-    return scraper_name, data, metadata
+    result = _original_execute_async_task(json_data)
+    _claim_task_ids(user["id"], result)
+    return result
 
 
-_routes_logic.validate_task_request = _validate_task_request_for_user
+def _execute_async_tasks_for_user(json_data):
+    user = _require_user()
+    result = _original_execute_async_tasks(json_data)
+    _claim_task_ids(user["id"], result)
+    return result
+
+
+def _execute_sync_task_for_user(json_data):
+    user = _require_user()
+    result = _original_execute_sync_task(json_data)
+    _claim_task_ids(user["id"], result)
+    return result
+
+
+def _execute_sync_tasks_for_user(json_data):
+    user = _require_user()
+    result = _original_execute_sync_tasks(json_data)
+    _claim_task_ids(user["id"], result)
+    return result
+
+
+_routes_logic.execute_async_task = _execute_async_task_for_user
+_routes_logic.execute_async_tasks = _execute_async_tasks_for_user
+_routes_logic.execute_sync_task = _execute_sync_task_for_user
+_routes_logic.execute_sync_tasks = _execute_sync_tasks_for_user
 
 
 # Filter task listings by the current authenticated user.
@@ -638,12 +702,18 @@ def _query_tasks_for_user(ets, with_results, page=None, per_page=None, serialize
     if serializer is None:
         serializer = serialize_task
 
+    with _db() as conn:
+        owned_ids = {
+            row["task_id"]
+            for row in conn.execute(
+                "SELECT task_id FROM task_owners WHERE user_id = ?",
+                (int(user["id"]),),
+            ).fetchall()
+        }
+
     with Session() as session:
         all_tasks = session.query(Task).order_by(Task.sort_id.desc()).all()
-        user_tasks = [
-            task for task in all_tasks
-            if int((task.meta_data or {}).get("kf_user_id", -1)) == int(user["id"])
-        ]
+        user_tasks = [task for task in all_tasks if task.id in owned_ids]
 
         total_count = len(user_tasks)
 
