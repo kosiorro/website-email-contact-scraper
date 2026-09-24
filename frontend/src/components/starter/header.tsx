@@ -1,109 +1,40 @@
-import {
-  EuiCollapsibleNav,
-  EuiCollapsibleNavGroup,
-  EuiFlexItem,
-  EuiHeader,
-  EuiHeaderLink,
-  EuiHeaderSectionItemButton,
-  EuiIcon,
-  EuiListGroup,
-  EuiListGroupItem,
-  EuiTitle,
-  useGeneratedHtmlId,
-} from '@elastic/eui';
-import { useState } from 'react';
+import { useEffect, useState } from 'react'
+import { useRouter } from 'next/router'
 
-import { Link } from '../Link';
+import { AuthApi } from '../../utils/auth-api'
+import { Link } from '../Link'
 
-function Logo() {
-  return <div className="brand-mark" aria-hidden="true">@</div>
-}
+export default function Header() {
+  const router = useRouter()
+  const [user, setUser] = useState<any>(null)
 
-function HeaderLogo({ header_title, white = false }) {
-  return (
-    <Link href="/" passHref>
-      <a className="brand-link">
-        <Logo />
-        <EuiTitle size="xxs" className="title-lh">
-          <span style={white ? { color: '#ffffff' } : undefined}>
-            {header_title || 'KontaktFinder'}
-          </span>
-        </EuiTitle>
-      </a>
-    </Link>
-  )
-}
+  useEffect(() => {
+    AuthApi.me().then(({ data }) => setUser(data.user)).catch(() => {})
+  }, [])
 
-const Header = ({ header_title }) => {
-  const guideHeaderCollapsibleNavId = useGeneratedHtmlId({
-    prefix: 'guideHeaderCollapsibleNav',
-  })
-
-  const [navIsOpen, setNavIsOpen] = useState(false)
-
-  const collapsibleNav = (
-    <EuiCollapsibleNav
-      key="collapsible-nav"
-      id={guideHeaderCollapsibleNavId}
-      aria-label="Główna nawigacja"
-      isOpen={navIsOpen}
-      isDocked={false}
-      button={
-        <EuiHeaderSectionItemButton
-          aria-label="Otwórz menu"
-          onClick={() => setNavIsOpen(!navIsOpen)}>
-          <EuiIcon type="menu" size="m" aria-hidden="true" />
-        </EuiHeaderSectionItemButton>
-      }
-      onClose={() => setNavIsOpen(false)}>
-      <EuiFlexItem className="eui-yScroll">
-        <EuiCollapsibleNavGroup className="h-full child-h-full" background="none">
-          <EuiListGroup maxWidth="none" color="subdued" gutterSize="none" size="s">
-            <Link href="/" passHref>
-              <EuiListGroupItem label="Skanowanie" />
-            </Link>
-            <Link href="/tasks" passHref>
-              <EuiListGroupItem label="Zadania" />
-            </Link>
-            <Link href="/api-integration" passHref>
-              <EuiListGroupItem label="API" />
-            </Link>
-            <Link href="/about" passHref>
-              <EuiListGroupItem label="Informacje" />
-            </Link>
-          </EuiListGroup>
-        </EuiCollapsibleNavGroup>
-      </EuiFlexItem>
-    </EuiCollapsibleNav>
-  )
-
-  const header_items: any = [
-    {
-      items: [
-        collapsibleNav,
-        <div className="w-3" key="spacer" />,
-        <HeaderLogo key="logo" header_title={header_title} white />,
-      ],
-      borders: 'none',
-    },
-    {
-      items: [
-        <EuiHeaderLink key="scan" href="/">Skanowanie</EuiHeaderLink>,
-        <EuiHeaderLink key="tasks" href="/tasks">Zadania</EuiHeaderLink>,
-        <EuiHeaderLink key="api" href="/api-integration">API</EuiHeaderLink>,
-      ],
-      borders: 'none',
-    },
-  ]
+  const logout = async () => {
+    await AuthApi.logout()
+    router.replace('/login')
+  }
 
   return (
-    <EuiHeader
-      role="navigation"
-      position="fixed"
-      theme="dark"
-      sections={header_items}
-    />
+    <header className="mk-header">
+      <div className="mk-header-inner">
+        <Link href="/" passHref>
+          <a className="mk-logo">
+            <strong>mk<span>✱</span></strong>
+            <em>kontakt finder</em>
+          </a>
+        </Link>
+
+        <nav className="mk-nav">
+          <Link href="/" passHref><a>Skanowanie</a></Link>
+          <Link href="/tasks" passHref><a>Zadania</a></Link>
+          <Link href="/database" passHref><a>Baza kontaktów</a></Link>
+          <Link href="/settings" passHref><a>Ustawienia</a></Link>
+          {user ? <button onClick={logout}>{user.username} · Wyloguj ↗</button> : null}
+        </nav>
+      </div>
+    </header>
   )
 }
-
-export default Header
