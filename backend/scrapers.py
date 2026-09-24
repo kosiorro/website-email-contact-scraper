@@ -4,12 +4,12 @@ from botasaurus_server.ui import CustomField, ExpandListField, Field, View, filt
 from src.contact_scraper import scrape_contacts
 
 Server.configure(
-    title="Website Email & Contact Scraper",
-    header_title="Website Email & Contact Scraper",
-    description="Extract emails, phone numbers, social media profiles, and the tech stack of any website.",
+    title="KontaktFinder",
+    header_title="KontaktFinder",
+    description="Znajdź publicznie dostępne adresy e-mail, numery telefonów, profile społecznościowe i technologie używane przez dowolną stronę.",
     right_header={
-        "text": "Love It? Star It! ★",
-        "link": "https://github.com/omkarcloud/website-email-contact-scraper",
+        "text": "Wyszukiwarka kontaktów",
+        "link": None,
     },
 )
 
@@ -18,10 +18,6 @@ DEFAULT_MODE = "key_pages"
 
 
 def _split_task(data):
-    # One task per website. Each item is the {'query', 'mode'} dict that
-    # scrape_contacts accepts directly - the server passes it verbatim as the
-    # scraper's argument, and a dict is the only way to carry the crawl mode
-    # through a botasaurus @task.
     mode = (data.get("mode") or DEFAULT_MODE).strip().lower()
     if mode not in CRAWL_MODES:
         mode = DEFAULT_MODE
@@ -44,7 +40,7 @@ def _join_names(record):
 
 
 overview_view = View(
-    "Overview",
+    "Podsumowanie",
     [
         Field("domain"),
         Field("title"),
@@ -62,7 +58,7 @@ overview_view = View(
 )
 
 email_list_view = View(
-    "Email List",
+    "Adresy e-mail",
     [
         Field("domain"),
         ExpandListField(
@@ -78,16 +74,16 @@ email_list_view = View(
 
 Server.add_scraper(
     scrape_contacts,
-    display_name="Website Contact Scraper",
+    display_name="Wyszukiwarka kontaktów",
     get_task_name=lambda item: item["query"],
     create_all_task=True,
     split_task=_split_task,
     filters=[
         filters.SearchTextInput("domain"),
-        filters.IsTruthyCheckbox("emails", label="Has Emails"),
-        filters.IsTruthyCheckbox("phones", label="Has Phones"),
-        filters.IsTruthyCheckbox("linkedins", label="Has LinkedIn"),
-        filters.IsNotNullCheckbox("error", label="Has Error"),
+        filters.IsTruthyCheckbox("emails", label="Posiada e-mail"),
+        filters.IsTruthyCheckbox("phones", label="Posiada telefon"),
+        filters.IsTruthyCheckbox("linkedins", label="Posiada LinkedIn"),
+        filters.IsNotNullCheckbox("error", label="Zawiera błąd"),
     ],
     sorts=[
         sorts.AlphabeticAscendingSort("domain"),
