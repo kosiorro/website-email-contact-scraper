@@ -12,16 +12,17 @@ export const TabsId = {
 }
 
 const tabs = [
-  { route: '/', id: TabsId.INPUT, name: 'Input', content: <></> },
-  { route: '/tasks', id: TabsId.TASKS, name: 'Tasks', content: <></> },
-  { route: '/about', id: TabsId.ABOUT, name: 'About', content: <></> },
+  { route: '/', id: TabsId.INPUT, name: 'Skanowanie', content: <></> },
+  { route: '/tasks', id: TabsId.TASKS, name: 'Zadania', content: <></> },
+  { route: '/about', id: TabsId.ABOUT, name: 'Informacje', content: <></> },
   {
     route: '/api-integration',
     id: TabsId.API_INTEGRATION,
-    name: 'API Integration',
+    name: 'API',
     content: <></>,
   },
 ]
+
 const PagesTabs = ({ initialSelectedTab, onTabChange = null }) => {
   const [selectedTabId, setSelectedTabId] = useState(initialSelectedTab)
   const router = useRouter()
@@ -40,7 +41,7 @@ const PagesTabs = ({ initialSelectedTab, onTabChange = null }) => {
 
   return (
     <Tabs
-      className="mt-2"
+      className="app-tabs"
       tabs={tabs}
       selectedTab={selectedTabId}
       onTabChange={handleTabChangeFn}
