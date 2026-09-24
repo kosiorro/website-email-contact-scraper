@@ -3,11 +3,11 @@ export const Container = ({ children }) => {
     <div
       className="home-container"
       style={{
-        paddingLeft: '16px',
-        paddingRight: '16px',
-        paddingBottom: '32px',
+        paddingLeft: '20px',
+        paddingRight: '20px',
+        paddingBottom: '48px',
         margin: '0 auto',
-        maxWidth: '800px',
+        maxWidth: '1080px',
       }}>
       {children}
     </div>
@@ -19,24 +19,23 @@ export const OutputTabsContainer = ({ children }) => {
     <div
       className="home-container"
       style={{
-        paddingLeft: '16px',
-        paddingRight: '16px',
+        paddingLeft: '20px',
+        paddingRight: '20px',
         margin: '0 auto',
-        maxWidth: '800px',
+        maxWidth: '1080px',
       }}>
       {children}
     </div>
   )
 }
 
-
 export const OutputContainer = ({ children }) => {
   return (
     <div
       className="home-container"
       style={{
-        paddingLeft: '16px',
-        paddingRight: '16px',
+        paddingLeft: '20px',
+        paddingRight: '20px',
         paddingBottom: '32px',
         margin: '0 auto',
         maxWidth: '1200px',
@@ -46,13 +45,13 @@ export const OutputContainer = ({ children }) => {
   )
 }
 
-export const OutputContainerWithBottomPadding = ({ children , className=""}) => {
+export const OutputContainerWithBottomPadding = ({ children, className="" }) => {
   return (
     <div
       className={className}
       style={{
-        paddingLeft: '16px',
-        paddingRight: '16px',
+        paddingLeft: '20px',
+        paddingRight: '20px',
         paddingBottom: '32px',
         margin: '0 auto',
         maxWidth: '1200px',
@@ -63,6 +62,5 @@ export const OutputContainerWithBottomPadding = ({ children , className=""}) => 
 }
 
 export const TabWrapper = ({ children }) => {
-  return <div className="mt-4">{children}</div>
+  return <div className="workspace-body">{children}</div>
 }
-
