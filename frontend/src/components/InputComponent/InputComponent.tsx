@@ -272,11 +272,11 @@ const InputFields = ({
           </EuiFormRow>
         )
       }, accords, onToggle)}
-      <div className="mt-6 flex gap-x-8">
+      <div className="form-actions mt-6 flex gap-x-8">
         <EuiButton disabled={isSubmitting} type="submit" fill onClick={onSubmit}>
           Run
         </EuiButton>
-        <EuiButtonEmpty onClick={onReset}>Reset to Default</EuiButtonEmpty>
+        <EuiButtonEmpty onClick={onReset}>Wyczyść formularz</EuiButtonEmpty>
       </div>
     </div>
   )
@@ -415,7 +415,7 @@ const ScraperFormContainer = ({ scrapers }) => {
       const result = response.data
       const isarr = Array.isArray(result)
       if (isarr && result.length === 0) {
-        Toast.error('No Tasks were created.')
+        Toast.error('Nie utworzono żadnych zadań.')
       }else {
         const outputId = isarr ? result[0].id : result.id
         if (outputId) {
