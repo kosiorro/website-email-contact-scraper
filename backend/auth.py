@@ -639,10 +639,13 @@ def _query_tasks_for_user(ets, with_results, page=None, per_page=None, serialize
         serializer = serialize_task
 
     with Session() as session:
-        base = session.query(Task).filter(
-            Task.meta_data["kf_user_id"].as_integer() == int(user["id"])
-        )
-        total_count = base.count()
+        all_tasks = session.query(Task).order_by(Task.sort_id.desc()).all()
+        user_tasks = [
+            task for task in all_tasks
+            if int((task.meta_data or {}).get("kf_user_id", -1)) == int(user["id"])
+        ]
+
+        total_count = len(user_tasks)
 
         if per_page is None:
             per_page = 1 if total_count == 0 else total_count
@@ -652,20 +655,11 @@ def _query_tasks_for_user(ets, with_results, page=None, per_page=None, serialize
 
         total_pages = max((total_count + per_page - 1) // per_page, 1)
         page = max(min(int(page), total_pages), 1)
-
-        tasks_query = (
-            session.query(Task)
-            .filter(Task.meta_data["kf_user_id"].as_integer() == int(user["id"]))
-            .with_entities(*ets)
-            .order_by(Task.sort_id.desc())
-        )
-
         start = (page - 1) * per_page
-        tasks = tasks_query.limit(per_page).offset(start).all()
+        tasks = user_tasks[start:start + per_page]
 
-        current_page = page
-        next_page = current_page + 1 if (current_page * per_page) < total_count else None
-        previous_page = current_page - 1 if current_page > 1 else None
+        next_page = page + 1 if (page * per_page) < total_count else None
+        previous_page = page - 1 if page > 1 else None
 
         if next_page:
             next_page = _routes_logic.create_page_url(next_page, per_page, with_results)
