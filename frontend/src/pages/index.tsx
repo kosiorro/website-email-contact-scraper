@@ -1,29 +1,55 @@
 import AuthedDashboard from '../components/AuthedDashboard'
-import Description from '../components/Description/Description'
 import InputComponent from '../components/InputComponent/InputComponent'
-import Tabs, { TabsId } from '../components/PagesTabs/PagesTabs'
+import { Link } from '../components/Link'
 import Seo from '../components/Seo'
-import { Container, TabWrapper } from '../components/Wrappers'
-import { create_title } from '../utils/common'
+import { Container } from '../components/Wrappers'
 import { homeServerSideProps } from '../utils/props'
 
-// Create a Container Component adds padding
 const Page = ({ ...props }: any) => {
   return (
     <>
-      <Seo {...props} title={create_title(props, 'Home')} />
+      <Seo
+        {...props}
+        title="KontaktFinder — wyszukiwarka danych kontaktowych"
+        description="Znajdź publicznie dostępne dane kontaktowe firm i buduj własną bazę kontaktów."
+      />
       <AuthedDashboard {...props}>
         <Container>
-          <Description {...props} />
-          <Tabs initialSelectedTab={TabsId.INPUT} />
-          <TabWrapper>
+          <section className="mk-hero">
+            <div className="mk-hero-copy">
+              <div className="auth-kicker"><i /> OD STRONY DO KONTAKTU</div>
+              <h1>Znajdź kontakt do firmy.<br/><span>Bez ręcznego szukania.</span></h1>
+              <p>
+                Skanuj strony internetowe, zbieraj publiczne adresy e-mail,
+                telefony, profile społecznościowe i technologie. Każdy wynik
+                trafia do Twojej własnej bazy kontaktów.
+              </p>
+            </div>
+            <div className="mk-hero-visual" aria-hidden="true">
+              <div className="orbit orbit-a">EMAIL</div>
+              <div className="orbit orbit-b">TEL</div>
+              <div className="orbit orbit-c">LINKEDIN</div>
+              <div className="orbit orbit-d">TECH</div>
+            </div>
+          </section>
+
+          <section className="scan-panel">
+            <div className="scan-panel-heading">
+              <div>
+                <span className="eyebrow">NOWE SKANOWANIE</span>
+                <h2>Jakie strony mam sprawdzić?</h2>
+              </div>
+              <Link href="/database" passHref>
+                <a className="text-action">Przejdź do bazy kontaktów ↗</a>
+              </Link>
+            </div>
             <InputComponent {...props} />
-          </TabWrapper>
+          </section>
         </Container>
-      </AuthedDashboard>    </>
+      </AuthedDashboard>
+    </>
   )
 }
+
 export const getServerSideProps = homeServerSideProps
-
 export default Page
-

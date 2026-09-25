@@ -7,23 +7,21 @@
  */
 function getInput(controls) {
     controls
-        // Render a list of website inputs
         .listOfTexts('websites', {
             isRequired: true,
-            label: 'Websites',
-            placeholder: 'vercel.com',
-            defaultValue: ["vercel.com"],
-            helpText: 'Domains or URLs of the websites to extract contact details from',
+            label: 'Adresy stron',
+            placeholder: 'example.pl',
+            defaultValue: [],
+            helpText: 'Podaj domeny lub pełne adresy URL stron, z których chcesz wyszukać dane kontaktowe.',
         })
-        // Crawl depth per website
         .select('mode', {
-            label: 'Crawl Mode',
-            defaultValue: 'deep',
+            label: 'Zakres skanowania',
+            defaultValue: 'key_pages',
             options: [
-                { value: 'homepage', label: 'Homepage only' },
-                { value: 'key_pages', label: 'Key pages' },
-                { value: 'deep', label: 'Deep' },
+                { value: 'homepage', label: 'Tylko strona główna' },
+                { value: 'key_pages', label: 'Najważniejsze podstrony' },
+                { value: 'deep', label: 'Pełne skanowanie' },
             ],
-            helpText: 'Deep crawls up to 20 pages and finds the most emails. Key pages is faster but may miss them.',
+            helpText: 'Pełne skanowanie sprawdza do 20 podstron i zwykle znajduje najwięcej danych. Najważniejsze podstrony działają szybciej.',
         })
 }

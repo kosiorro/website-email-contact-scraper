@@ -7,7 +7,7 @@ import { outputServerSideProps } from '../../utils/props'
 const Page = ({ tasks, ...props }: any) => {
   return (
     <>
-      <Seo {...props} title={'Tasks'} />
+      <Seo {...props} title={'Zadania'} />
 
       <AuthedDashboard {...props}>
       <OutputComponent {...props} tasks={tasks} />

@@ -17,12 +17,12 @@ const Page = ({ taskId, scrapers, ...props }: any) => {
   const scraperConfig = findScraperConfig(scrapers, task)
 
   if (!scraperConfig) {
-    return <div>No Scraper Config Found, Did you forgot to add Scraper?</div>
+    return <div>Nie znaleziono konfiguracji scrapera.</div>
   }
 
   return (
     <>
-      <Seo {...props} title={create_title(props, `Result ${taskId}`)} />
+      <Seo {...props} title={create_title(props, `Wynik ${taskId}`)} />
       <AuthedDashboard {...props}>
         <TaskComponent taskId={taskId} response={response} {...scraperConfig} />
       </AuthedDashboard>

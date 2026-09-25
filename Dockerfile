@@ -3,7 +3,7 @@ FROM nikolaik/python-nodejs:python3.14-nodejs22-slim
 ARG TARGETARCH
 
 ENV PYTHONUNBUFFERED=1
-ENV NPM_CONFIG_LEGACY_PEER_DEPS=true
+ENV NPM_CONFIG_LEGACY_PEER_DEPS=true\nENV KONTAKTFINDER_DB=/data/kontaktfinder.sqlite
 
 # System + Chrome dependencies
 RUN apt-get update && apt-get install -y \
@@ -33,7 +33,7 @@ COPY requirements.txt .
 
 RUN python -m pip install -r requirements.txt
 
-RUN mkdir -p /app
+RUN mkdir -p /app /data
 WORKDIR /app
 
 COPY . /app

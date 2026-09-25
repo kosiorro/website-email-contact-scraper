@@ -22,10 +22,11 @@ function getApi() {
   return AxiosInstance.get(null, { silent: true, silenceError:true  })
 }
 
-function getTasksForUiDisplay(page=1) {
+function getTasksForUiDisplay(page=1, headers:any = undefined) {
   return AxiosInstance.get(`/ui/tasks?page=${page}`, {
     silent: true,
     silenceError:true,
+    headers,
   })
 }
 
@@ -93,8 +94,8 @@ function downloadTaskResults(taskId, data = {}) {
   }).then(downloadViaLink)  
 }
 
-function getUiTaskResults(taskId, data = {}, force_apply_first_view = false, signal=undefined) {
-  return AxiosInstance.post( force_apply_first_view ?`/ui/tasks/${taskId}/results?force_apply_first_view=${force_apply_first_view}` :`/ui/tasks/${taskId}/results` , data, { silent: true , silenceError:true, signal:signal})
+function getUiTaskResults(taskId, data = {}, force_apply_first_view = false, signal=undefined, headers:any = undefined) {
+  return AxiosInstance.post( force_apply_first_view ?`/ui/tasks/${taskId}/results?force_apply_first_view=${force_apply_first_view}` :`/ui/tasks/${taskId}/results` , data, { silent: true , silenceError:true, signal:signal, headers})
 }
 
 const Api = {
